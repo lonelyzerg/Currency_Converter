@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Currency Exchange Calculator</string>
+    <string name="usd">US dollar - USD</string>
+    <string name="update_str">Update Exchange Rate</string>
+</resources>
