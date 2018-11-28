@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView state;
     private TextView currency2_amount;
     private EditText currency1_amount;
+    private Button convert;
     private int currency1;
     private int currency2;
     private boolean first;
@@ -65,9 +67,11 @@ public class MainActivity extends AppCompatActivity {
         currency_spinner2 = (Spinner) findViewById(R.id.currency2);
         currency1_amount = (EditText) findViewById(R.id.currency1_amount);
         currency2_amount = (TextView) findViewById(R.id.currency2_amount);
+        convert = (Button) findViewById(R.id.calculate_btn);
         final String[] currency_list = getResources().getStringArray(R.array.currency);
         final TypedArray flag_list = getResources().obtainTypedArray(R.array.currency_flag);
         codes = getResources().getStringArray(R.array.code);
+        rates = new double[codes.length];
         CurrencySpinnerAdapter adapter = new CurrencySpinnerAdapter(MainActivity.this, currency_list, flag_list);
         currency_spinner1.setAdapter(adapter);
         currency_spinner2.setAdapter(adapter);
@@ -88,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences("settings", 0);
         editor = settings.edit();
         if(first = settings.getBoolean("first", true)){
+            convert.setClickable(false);
+            currency1_amount.setFocusable(false);
             editor.putBoolean("first", true);
             editor.putInt("currency1", 0);
             editor.putInt("currency2", 1);
@@ -95,11 +101,19 @@ public class MainActivity extends AppCompatActivity {
             state.setText(R.string.first_update);
             currency_spinner1.setSelection(0,false);
             currency_spinner2.setSelection(1,false);
+            updateRate(null);
+            if(!first){
+                retrieveData(settings);
+                convert.setClickable(true);
+                currency1_amount.setFocusableInTouchMode(true);
+            }
         }else{
             retrieveData(settings);
             update_time = settings.getLong("update_time", 0L);
             String date = new SimpleDateFormat(getString(R.string.date_format)).format(new Date(update_time));
             state.setText(getString(R.string.updated_status) + date);
+            convert.setClickable(true);
+            currency1_amount.setFocusableInTouchMode(true);
         }
 
     }
@@ -111,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         currency_spinner2.setSelection(currency2);
         Log.i("calculate", String.valueOf(currency1));
         Log.i("calculate", String.valueOf(currency2));
-        rates = new double[codes.length];
+
         for(int i = 0; i < codes.length; i++){
             rates[i] = getDouble(settings, codes[i], 0.0);
         }
@@ -128,6 +142,11 @@ public class MainActivity extends AppCompatActivity {
             //Toast toast = Toast.makeText(getApplicationContext(),R.string.empty_input, Toast.LENGTH_SHORT);
             //toast.show();
             currency2_amount.setText("0.000");
+            return;
+        }
+        if(first){
+            Toast toast = Toast.makeText(getApplicationContext(),R.string.first_update, Toast.LENGTH_SHORT);
+            toast.show();
             return;
         }
         if(!amout.matches("\\d+(\\.\\d+)*")){
@@ -171,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
 
             if(first){
                 putDouble(editor, "USD", 1.00);
+                first = false;
                 editor.putBoolean("first", false);
             }
             Date d = Calendar.getInstance().getTime();
