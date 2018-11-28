@@ -187,7 +187,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // TODO Auto-generated method stub
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             if (getCurrentFocus() != null
                     && getCurrentFocus().getWindowToken() != null) {
