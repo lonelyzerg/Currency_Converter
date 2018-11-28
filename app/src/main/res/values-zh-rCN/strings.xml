@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">货币转换计算器</string>
-    <string name="usd">美元 - USD</string>
+    <string name="usd">美元</string>
     <string name="update_str">更新汇率</string>
+    <string name="cny">人民币</string>
+    <string name="convert_btn">进行转换</string>
 </resources>
